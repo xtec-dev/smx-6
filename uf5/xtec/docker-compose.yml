@@ -1,13 +1,16 @@
 version: "3.5"
 services:
 
-  # Server ####################################################################
-  server:
+  # Hub ####################################################################
+  hub:
     image: ubuntu:22.04
     networks:
-      hub:
-      etherpad:
-      mailu:
+      xtec-hub:
+        ipv4_address: 10.1.0.21
+      xtec-etherpad:
+        ipv4_address: 10.2.0.11
+      xtec-mailu:
+        ipv4_address: 10.3.0.11
     command: [ 'sleep', 'infinity' ]
 
   # Etherpad ##################################################################
@@ -15,15 +18,15 @@ services:
   etherpad:
     image: etherpad/etherpad:1.8.10
     networks:
-      etherpad:
-        ipv4_address: 10.2.0.6
+      xtec-etherpad:
+        ipv4_address: 10.2.0.21
     environment:
       - TITLE=SMX-8
       - DEFAULT_PAD_TEXT=Welcome to SMX-8
       - ADMIN_PASSWORD=${ETHERPAD_ADMIN_PASSWORD}
       - ADMIN_USER=admin
       - DB_TYPE=mysql
-      - DB_HOST=mariadb
+      - DB_HOST=etherpad_mariadb
       - DB_PORT=3306
       - DB_USER=etherpad
       - DB_PASS=${MARIADB_PASSWORD}
@@ -35,13 +38,11 @@ services:
       - "3000:9001"
     depends_on:
       - etherpad_mariadb
-    dns:
-      - 10.2.0.254
 
   etherpad_mariadb:
     image: mariadb:10.6
     networks:
-      etherpad:
+      xtec-etherpad:
     environment:
       - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
       - MYSQL_DATABASE=etherpad
@@ -61,14 +62,14 @@ services:
       start_period: 10s
       timeout: 10s
       retries: 3
-    dns:
-      - 10.2.0.254
 
   # mailu ######################################################################
 
   mailu_redis:
     image: redis:alpine
     restart: always
+    networks:
+      xtec-mailu:
     volumes:
       - "/mailu/redis:/data"
     depends_on:
@@ -80,6 +81,8 @@ services:
     image: ${DOCKER_ORG:-mailu}/${DOCKER_PREFIX:-}nginx:${MAILU_VERSION:-1.9}
     restart: always
     env_file: mailu.env
+    networks:
+      xtec-mailu: #ipv4_address: 10.3.0.11
     logging:
       driver: json-file
     ports:
@@ -105,19 +108,21 @@ services:
     env_file: mailu.env
     restart: always
     networks:
-      default:
+      xtec-mailu:
         ipv4_address: 10.3.0.254
 
   mailu_admin:
     image: ${DOCKER_ORG:-mailu}/${DOCKER_PREFIX:-}admin:${MAILU_VERSION:-1.9}
     restart: always
     env_file: mailu.env
+    networks:
+      xtec-mailu:
     volumes:
       - "/mailu/data:/data"
       - "/mailu/dkim:/dkim"
     depends_on:
-      - redis
-      - resolver
+      - mailu_redis
+      - mailu_resolver
     dns:
       - 10.3.0.254
 
@@ -125,6 +130,8 @@ services:
     image: ${DOCKER_ORG:-mailu}/${DOCKER_PREFIX:-}dovecot:${MAILU_VERSION:-1.9}
     restart: always
     env_file: mailu.env
+    networks:
+      xtec-mailu:
     volumes:
       - "/mailu/mail:/mail"
       - "/mailu/overrides/dovecot:/overrides:ro"
@@ -138,6 +145,8 @@ services:
     image: ${DOCKER_ORG:-mailu}/${DOCKER_PREFIX:-}postfix:${MAILU_VERSION:-1.9}
     restart: always
     env_file: mailu.env
+    networks:
+      xtec-mailu:
     volumes:
       - "/mailu/mailqueue:/queue"
       - "/mailu/overrides/postfix:/overrides:ro"
@@ -152,6 +161,8 @@ services:
     hostname: antispam
     restart: always
     env_file: mailu.env
+    networks:
+      xtec-mailu:
     volumes:
       - "/mailu/filter:/var/lib/rspamd"
       - "/mailu/overrides/rspamd:/etc/rspamd/override.d:ro"
@@ -165,6 +176,8 @@ services:
     image: ${DOCKER_ORG:-mailu}/${DOCKER_PREFIX:-}clamav:${MAILU_VERSION:-1.9}
     restart: always
     env_file: mailu.env
+    networks:
+      xtec-mailu:
     volumes:
       - "/mailu/filter:/data"
     depends_on:
@@ -176,6 +189,8 @@ services:
     image: ${DOCKER_ORG:-mailu}/${DOCKER_PREFIX:-}roundcube:${MAILU_VERSION:-1.9}
     restart: always
     env_file: mailu.env
+    networks:
+      xtec-mailu:
     volumes:
       - "/mailu/webmail:/data"
       - "/mailu/overrides/roundcube:/overrides:ro"
@@ -187,21 +202,21 @@ services:
 
 networks:
 
-  hub:
+  xtec-hub:
     driver: bridge
     ipam:
       driver: default
       config:
         - subnet: 10.1.0.0/24
 
-  etherpad:
+  xtec-etherpad:
     driver: bridge
     ipam:
       driver: default
       config:
         - subnet: 10.2.0.0/24
 
-  mailu:
+  xtec-mailu:
     driver: bridge
     ipam:
       driver: default
