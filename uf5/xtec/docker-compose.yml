@@ -1,0 +1,47 @@
+version: "3.5"
+services:
+
+  # Etherpad
+
+  etherpad:
+    image: etherpad/etherpad:1.8.10
+    environment:
+      - TITLE=SMX-8
+      - DEFAULT_PAD_TEXT=Welcome to SMX-8
+      - ADMIN_PASSWORD=${ETHERPAD_ADMIN_PASSWORD}
+      - ADMIN_USER=admin
+      - DB_TYPE=mysql
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_USER=etherpad
+      - DB_PASS=${MARIADB_PASSWORD}
+      - DB_NAME=etherpad
+      - DB_CHARSET=utf8mb4
+      - API_KEY=${ETHERPAD_API_KEY}
+      - SESSION_REQUIRED=false
+    ports:
+      - "3000:9001"
+    depends_on:
+      - mariadb
+
+  mariadb:
+    image: mariadb:10.6
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=etherpad
+      - MYSQL_USER=etherpad
+      - MYSQL_PASSWORD=${MARIADB_PASSWORD}
+    #volumes:
+    #  - './data:/var/lib/mysql'
+    command:
+      [
+        'mysqld',
+        '--character-set-server=utf8mb4',
+        '--collation-server=utf8mb4_unicode_ci'
+      ]
+    healthcheck:
+      test: mysqladmin -p${MARIADB_ROOT_PASSWORD} ping -h localhost
+      interval: 20s
+      start_period: 10s
+      timeout: 10s
+      retries: 3
