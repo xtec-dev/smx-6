@@ -1,4 +1,8 @@
 #!/bin/bash
-mkdir data
-echo "a lot of data" > data/data.txt
+mkdir -p data
+
+for ((i = 1; i <= 20; ++i)); do
+  echo "a lot of data: $RANDOM" > "data/data-$i.txt"
+done
+
 
