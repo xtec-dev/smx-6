@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# filebase.com
 
 if [ ! -f /usr/local/bin/aws ]; then
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -11,6 +10,12 @@ if [ ! -f /usr/local/bin/aws ]; then
 fi
 
 # keys on https://console.filebase.com/keys
-# Region: us-east-1
-# Output Format: Optional
-aws configure
+#aws configure
+
+mkdir -p ~./aws
+echo "[default]
+region = us-east-1
+output = Optional
+" >> ~./aws/config
+
+# aws --endpoint https://s3.filebase.com s3 ls
