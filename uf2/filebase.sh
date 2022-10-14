@@ -26,7 +26,10 @@ case $1 in
 
     restore)
 
-        aws --endpoint https://s3.filebase.com --output json s3api  list-objects --bucket ${bucket}
+        backup=`aws --endpoint https://s3.filebase.com s3api list-objects --bucket ${bucket} \
+          --query 'Contents[].{Key:Key}'[-1:].Key`
+        echo $backup
+
         ;;
     
     *)
