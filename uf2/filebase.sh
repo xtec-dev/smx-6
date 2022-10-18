@@ -88,7 +88,7 @@ restore)
     ;;
 
 *)
-    echo "filebase backup | install | ls | restore"
+    echo "Usage: $0 backup | install | ls | restore"
     ;;
 
 esac
