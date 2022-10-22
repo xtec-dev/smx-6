@@ -10,9 +10,9 @@ install() {
         wget https://dl.min.io/client/mc/release/linux-amd64/mc
         chmod +x mc
         sudo mv mc /usr/local/bin
-
-        mc alias set local http://127.0.0.1:9000 ${minio_user} ${minio_password}
     fi
+
+    mc alias set local http://127.0.0.1:9000 ${minio_user} ${minio_password}
 
 }
 
