@@ -4,8 +4,9 @@
 KEY="3BAA2298F3AAB38625D5"
 SECRET="hzZPb21La2YiERrT0qvcpuJR6m1mMaRd9dx66qrB"
 
-password="password"
+
 bucket="smx-data-15689"
+key="very-secret"
 
 backup() {
 
@@ -16,7 +17,7 @@ backup() {
     install
 
     tar czf $file $data
-    openssl enc -aes-256-cbc -pbkdf2 -k $password -in $file -out $file
+    openssl enc -aes-256-cbc -pbkdf2 -k $key -in $file -out $file
 
     echo "Created file: ${file}"
 
@@ -64,6 +65,7 @@ restore() {
     #TODO filter by file name
     backup=$(aws --endpoint https://s3.filebase.com s3api list-objects --bucket ${bucket} \
         --query 'Contents[].{Key:Key}'[-1:].Key)
+    #TODO awk
     echo $backup
 
 }
