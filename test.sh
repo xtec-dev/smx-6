@@ -1,7 +1,7 @@
 #!/bin/bash
 
 shopt -s extglob
-rm -rf *.!("script.sh"|"uf*")
+rm -rf !(test.sh|uf*)
 
 
 
