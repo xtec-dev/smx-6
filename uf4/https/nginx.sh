@@ -2,13 +2,12 @@
 
 cat >nginx.conf <<EOF
 server {
-  listen 80;
+  listen 8080;
   server_name localhost;
-  # production server: return 301 https://$host$request_uri;
-  return 302 https://localhost$request_uri;
+  return 302 https://localhost:8443$request_uri;
 }
 server {
-  listen 443 ssl http2;
+  listen 8443 ssl http2;
   server_name localhost;
   location / {
     root /usr/share/nginx/html;
@@ -34,6 +33,6 @@ docker run --rm \
   --mount type=bind,src=${PWD}/html,dst=/usr/share/nginx/html/,readonly=true \
   --mount type=bind,src=${PWD}/nginx.conf,dst=/etc/nginx/conf.d/default.conf,readonly=true \
   --mount type=bind,src=${PWD}/certs,dst=/usr/share/nginx/certs/,readonly=true \
-  --publish 80:80 \
-  --publish 443:443 \
+  --publish 8080:8080 \
+  --publish 8443:8443 \
   nginx:1.23
