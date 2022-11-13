@@ -1,5 +1,13 @@
 #!/bin/bash
 
+mkdir -p certs
+! test -f certs/xtec.key && openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout certs/xtec.key -out certs/xtec.crt
+
+mkdir -p html
+! test -f html/index.html && cat >html/index.html <<EOF
+<p>Add content to html folder</p>
+EOF
+
 cat >nginx.conf <<EOF
 server {
   listen 8080;
@@ -19,14 +27,6 @@ server {
   ssl_prefer_server_ciphers on;
   ssl_ciphers ECDH+AESGCM:ECDH+AES256-CBC:ECDH+AES128-CBC:DH+3DES:!ADH:!AECDH:!MD5;
 }
-EOF
-
-mkdir -p certs
-! test -f certs/xtec.key && openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout certs/xtec.key -out certs/xtec.crt
-
-mkdir -p html
-! test -f html/index.html && cat >html/index.html <<EOF
-<p>Add content to html folder</p>
 EOF
 
 docker run --rm \
