@@ -1,3 +1,4 @@
 /certs
-/www
+/html
+httpd.conf
 nginx.conf

@@ -25,15 +25,15 @@ EOF
 mkdir -p certs
 ! test -f certs/xtec.key && openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout certs/xtec.key -out certs/xtec.crt
 
-mkdir -p www
-! test -f www/index.html && cat >www/index.html <<EOF
-<p>Add content to www folder</p>
+mkdir -p html
+! test -f html/index.html && cat >html/index.html <<EOF
+<p>Add content to html folder</p>
 EOF
 
 docker run --rm \
+  --mount type=bind,src=${PWD}/html,dst=/usr/share/nginx/html/,readonly=true \
   --mount type=bind,src=${PWD}/nginx.conf,dst=/etc/nginx/conf.d/default.conf,readonly=true \
   --mount type=bind,src=${PWD}/certs,dst=/usr/share/nginx/certs/,readonly=true \
-  --mount type=bind,src=${PWD}/www,dst=/usr/share/nginx/html/,readonly=true \
   --publish 80:80 \
   --publish 443:443 \
   nginx:1.23
