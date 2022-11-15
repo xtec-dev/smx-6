@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mkdir -p certs
-! test -f certs/xtec.key && openssl req -x509 -nodes -days 365 -subj '/CN=localhost' -newkey rsa:4096 -keyout certs/xtec.key -out certs/xtec.crt
+! test -f certs/server.key && openssl req -x509 -nodes -days 365 -subj '/CN=localhost' -newkey rsa:4096 -keyout certs/server.key -out certs/server.crt
 
 mkdir -p html
 ! test -f html/index.html && cat >html/index.html <<EOF
@@ -21,8 +21,8 @@ server {
     root /usr/share/nginx/html;
     index index.html index.htm;
   }
-  ssl_certificate /usr/share/nginx/certs/xtec.crt;
-  ssl_certificate_key /usr/share/nginx/certs/xtec.key;
+  ssl_certificate /usr/share/nginx/certs/server.crt;
+  ssl_certificate_key /usr/share/nginx/certs/server.key;
   ssl_protocols TLSv1.2 TLSv1.3;
   ssl_prefer_server_ciphers on;
   ssl_ciphers ECDH+AESGCM:ECDH+AES256-CBC:ECDH+AES128-CBC:DH+3DES:!ADH:!AECDH:!MD5;
