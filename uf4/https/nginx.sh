@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mkdir -p certs
-! test -f certs/xtec.key && openssl req -x509 -nodes -days 365 -newkey rsa:4096 -keyout certs/xtec.key -out certs/xtec.crt
+! test -f certs/xtec.key && openssl req -x509 -nodes -days 365 -subj '/CN=localhost' -newkey rsa:4096 -keyout certs/xtec.key -out certs/xtec.crt
 
 mkdir -p html
 ! test -f html/index.html && cat >html/index.html <<EOF
